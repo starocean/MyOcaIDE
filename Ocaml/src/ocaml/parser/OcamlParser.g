@@ -228,15 +228,14 @@
 
 
 implementation =
-    structure.s
+    impl_directive structure.s
     {:
     	Def root = new Def("root", Def.Type.Root, 0, 0);
     	root.add(s);
     	root.collapse();
     	return root;
     :}
-
-  | structure.s error
+  | impl_directive structure.s error
     {:
     	Def root = new Def("root", Def.Type.Root, 0, 0);
     	root.add(s);
@@ -358,10 +357,6 @@ structure_tail=
   | SEMISEMI structure_item.a structure_tail.b
     {: return Def.root(a,b); :}
   | structure_item.a structure_tail.b
-    {: return Def.root(a,b); :}
-  | SEMISEMI cppo_directive.a structure_tail.b
-    {: return Def.root(a,b); :}
-  | cppo_directive.a structure_tail.b
     {: return Def.root(a,b); :}
   | error
     {: return new Def(); :}
@@ -2470,18 +2465,20 @@ toplevel_directive=
     {: return new Def(); :}
 ;
 
-/* CPPO directives: http://mjambon.com/cppo.html*/
-// This is temporarily. Should support more CPPO's syntax.
-cppo_directive=
-    SHARP ident
+// This is temporarily. Should support more directive syntax.
+impl_directive=
+    /* empty */
     {: return new Def(); :}
-  | SHARP INCLUDE STRING
+  | impl_directive impl_directive_item opt_semi
+    {: return new Def(); :}
+;
+
+impl_directive_item=
+    SHARP ident
     {: return new Def(); :}
   | SHARP ident STRING
     {: return new Def(); :}
-//  | SHARP ident ident STRING
-//    {: return new Def(); :}
-  | SHARP ident ident seq_expr
+  | SHARP INCLUDE STRING
     {: return new Def(); :}
 ;
 
